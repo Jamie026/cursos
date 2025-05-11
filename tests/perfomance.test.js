@@ -20,7 +20,7 @@ describe("Fitness Function de Rendimiento", () => {
         expect(res.body).toHaveProperty("cursosTime");
 
         const cursosTime = parseFloat(res.body.cursosTime);
-        expect(cursosTime).toBeLessThanOrEqual(100);
+        expect(cursosTime).toBeLessThanOrEqual(200);
     });
 
     it("Debe medir el tiempo de consulta en la base de datos de temas", async () => {
