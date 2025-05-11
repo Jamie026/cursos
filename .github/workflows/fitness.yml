@@ -1,35 +1,37 @@
 name: Node.js CI
 
-on: # Eventos que disparan el workflow
+on:
   push:
-    branches: [ main, master, develop ] # Ajusta tus ramas principales
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master, develop ] # Ajusta tus ramas principales
+    branches: [ main, master, develop ]
 
 jobs:
-  build_and_test: # Nombre del job
-    runs-on: ubuntu-latest # Sistema operativo para ejecutar el job
+  build_and_test:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x] # Versiones de Node.js a probar
+        node-version: [22.x]
 
     steps:
-    - name: Checkout repository # Paso 1: Clonar el repositorio
-      uses: actions/checkout@v4 # Usar una acción predefinida de GitHub
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }} # Paso 2: Configurar Node.js
+    - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm' # Habilitar caché de dependencias npm
+        cache: 'npm'
 
-    - name: Install dependencies # Paso 3: Instalar dependencias
-      run: npm ci # 'ci' es generalmente más rápido y seguro para CI que 'install'
+    - name: Install dependencies
+      run: npm ci
 
-    - name: Run tests (Fitness Function) # Paso 4: Ejecutar las pruebas
-      run: npm test
+    - name: Run tests (Fitness Function) and save results
+      run: npm test > test-results-${{ matrix.node-version }}.txt 2>&1
 
-    # Opcional: Si tienes un build step
-    # - name: Build
-    #   run: npm run build --if-present
+    - name: Upload test results as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-node-${{ matrix.node-version }}
+        path: test-results-${{ matrix.node-version }}.txt
