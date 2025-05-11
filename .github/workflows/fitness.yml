@@ -1,28 +1,35 @@
+name: Node.js CI
+
+on: # Eventos que disparan el workflow
+  push:
+    branches: [ main, master, develop ] # Ajusta tus ramas principales
+  pull_request:
+    branches: [ main, master, develop ] # Ajusta tus ramas principales
+
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  build_and_test: # Nombre del job
+    runs-on: ubuntu-latest # Sistema operativo para ejecutar el job
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x] # Versiones de Node.js a probar
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository # Paso 1: Clonar el repositorio
+      uses: actions/checkout@v4 # Usar una acción predefinida de GitHub
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
+    - name: Use Node.js ${{ matrix.node-version }} # Paso 2: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm' # Habilitar caché de dependencias npm
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies # Paso 3: Instalar dependencias
+      run: npm ci # 'ci' es generalmente más rápido y seguro para CI que 'install'
 
-      - name: Create test-results directory
-        run: mkdir -p test-results
+    - name: Run tests (Fitness Function) # Paso 4: Ejecutar las pruebas
+      run: npm test
 
-      - name: Run tests
-        run: npm test -- --outputFile=test-results/test-results.json
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: test-results/
+    # Opcional: Si tienes un build step
+    # - name: Build
+    #   run: npm run build --if-present
