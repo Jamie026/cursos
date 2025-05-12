@@ -1,21 +1,20 @@
-const express = require('express');
-const session = require('express-session');
+const express = require("express");
+const session = require("express-session");
 const app = express();
-const PORT = 3000;
 
 app.use(express.json());
 app.use(session({
-    secret: "privete_key",
+    secret: "private_key",
     resave: false,
     saveUninitialized: true
 }));
 
 const users = require("./routes/users.js")
 const search = require("./routes/search.js")
+const download = require("./routes/download");
 
 app.use("/users", users);
-app.use("/performance", search)
-
-app.listen(PORT, () => console.log("Servidor ejecutado en el puerto", PORT));
+app.use("/performance", search);
+app.use("/download", download);
 
 module.exports = app;
